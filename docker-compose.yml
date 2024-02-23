@@ -1,0 +1,41 @@
+services:
+  db:
+    container_name: youcode_db
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres # Leave this set to postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 6432:5432
+
+    # networks:
+    #   - youcode
+    # network_mode: host
+
+    volumes:
+      - youcode-db-data:/var/lib/postgresql/data/pgdata
+
+  pgadmin:
+    container_name: youcode_pgadmin
+    image: dpage/pgadmin4:latest
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@postgres.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+    ports:
+      - 82:80
+    # network_mode: host
+    # networks:
+    #   - youcode
+
+# networks:
+#   youcode:
+#     name: youcode
+#     external: true
+#     driver: host
+
+volumes:
+  youcode-db-data:
