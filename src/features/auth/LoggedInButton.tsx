@@ -31,7 +31,7 @@ export type LoggedInButtonProps = {
 
 export const LoggedInButton = (props: LoggedInButtonProps) => {
   const mutation = useMutation({
-    mutationFn: async () => signOut(),
+    mutationFn: async () => signOut({ callbackUrl: "/" }),
   });
   return (
     <DropdownMenu>
