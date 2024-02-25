@@ -1,11 +1,11 @@
+import { Typography } from "@/components/ui/typography";
 import { SiteConfig } from "@/lib/site-config";
 import Image from "next/image";
 import Link from "next/link";
-import { Typography } from "@/components/ui/typography";
 
 export const Footer = () => {
   return (
-    <footer className="w-full border-t border-card">
+    <footer className="w-full border-t border-border">
       <div className="m-auto w-full max-w-3xl px-2 py-4">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-row items-center gap-2">
