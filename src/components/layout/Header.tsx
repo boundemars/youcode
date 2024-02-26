@@ -11,7 +11,7 @@ export function Header() {
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <div className="flex items-center gap-2">
           <Image
-            src="images/logo.svg"
+            src="/images/logo.svg"
             width={50}
             height={35}
             alt={"app logo"}
