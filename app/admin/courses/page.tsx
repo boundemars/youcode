@@ -19,7 +19,7 @@ import { getRequiredAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
-export default async function AdminPage() {
+export default async function CoursesPage() {
   const session = await getRequiredAuthSession();
 
   const courses = await prisma.course.findMany({
