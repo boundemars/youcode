@@ -5,7 +5,7 @@ import {
   LayoutTitle,
 } from "@/components/layout/layout";
 import { CourseCard } from "../courses/CourseCard";
-import { getCourses } from "../courses/course.query";
+import { getCourses } from "../courses/courses.query";
 
 export default async function ExplorerPage() {
   const courses = await getCourses();

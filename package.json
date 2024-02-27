@@ -41,12 +41,14 @@
     "react-day-picker": "^8.10.0",
     "react-dom": "^18",
     "react-hook-form": "^7.50.1",
+    "react-markdown": "^9.0.1",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@tailwindcss/typography": "^0.5.10",
     "@tanstack/eslint-plugin-query": "^5.20.1",
     "@types/node": "^20",
     "@types/react": "^18",

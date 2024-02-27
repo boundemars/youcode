@@ -7,7 +7,7 @@ import {
 import { NotAuthenticatedCard } from "@/features/errors/NotAuthenticatedCard";
 import { getAuthSession } from "@/lib/auth";
 import { CourseCard } from "../courses/CourseCard";
-import { getCourses } from "../courses/course.query";
+import { getCourses } from "./courses.query";
 
 export default async function CoursesPage() {
   const session = await getAuthSession();
