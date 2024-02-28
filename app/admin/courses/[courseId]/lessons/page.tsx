@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/form/SubmitedButton";
 import {
   Layout,
   LayoutContent,
@@ -6,7 +7,8 @@ import {
 } from "@/components/layout/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRequiredAuthSession } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { notFound, redirect } from "next/navigation";
 import { AdminLessonItem } from "./AdminLessonItem";
 import { getCourseLessons } from "./lessons.query";
 
@@ -28,6 +30,34 @@ export default async function CourseLessonsPage({
     notFound();
   }
 
+  const createLesson = async () => {
+    "use server";
+
+    const session = await getRequiredAuthSession();
+
+    const courseId = params.courseId;
+
+    // Authorize the user
+    await prisma.course.findFirstOrThrow({
+      where: {
+        creatorId: session.user.id,
+        id: courseId,
+      },
+    });
+
+    const lesson = await prisma.lesson.create({
+      data: {
+        name: "Draft Lesson",
+        rank: "aaaaa",
+        state: "HIDDEN",
+        courseId: courseId,
+        content: "## Default content",
+      },
+    });
+
+    redirect(`/admin/courses/${courseId}/lessons/${lesson.id}`);
+  };
+
   return (
     <Layout>
       <LayoutHeader>
@@ -42,6 +72,16 @@ export default async function CourseLessonsPage({
             {course.lessons.map((lesson) => (
               <AdminLessonItem key={lesson.id} lesson={lesson} />
             ))}
+            <form>
+              <SubmitButton
+                size="sm"
+                variant="secondary"
+                className="w-full"
+                formAction={createLesson}
+              >
+                Create lesson
+              </SubmitButton>
+            </form>
           </CardContent>
         </Card>
       </LayoutContent>
