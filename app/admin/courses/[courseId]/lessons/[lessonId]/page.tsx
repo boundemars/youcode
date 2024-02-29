@@ -30,7 +30,7 @@ export default async function CourseLessonsPage({
   }
 
   return (
-    <Layout className="max-w-5xl">
+    <Layout>
       <LayoutHeader>
         <LayoutTitle>{lesson.name}</LayoutTitle>
       </LayoutHeader>
