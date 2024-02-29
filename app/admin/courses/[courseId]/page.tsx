@@ -5,8 +5,15 @@ import {
   LayoutTitle,
 } from "@/components/layout/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -18,6 +25,9 @@ import {
 import { Typography } from "@/components/ui/typography";
 import { CoursePaginationButton } from "@/features/pagination/PaginationButton";
 import { getRequiredAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { Menu } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { getAdminCourse } from "./admin-course.query";
 
@@ -30,7 +40,7 @@ export default async function CoursePage({
   };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const page = Number(searchParams.page ?? 1);
+  const page = Number(searchParams.page ?? 0);
 
   const session = await getRequiredAuthSession();
 
@@ -39,6 +49,23 @@ export default async function CoursePage({
     userId: session.user.id,
     userPage: page,
   });
+
+  const handleStatus = async (userId: string, canceled: boolean) => {
+    "use server";
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
+    await prisma.courseOnUser.update({
+      where: {
+        userId_courseId: {
+          courseId: params.courseId,
+          userId: userId,
+        },
+      },
+      data: {
+        canceledAt: canceled ? null : today.toDateString(),
+      },
+    });
+  };
 
   return (
     <Layout>
@@ -53,12 +80,16 @@ export default async function CoursePage({
           <CardContent>
             <Table>
               <TableHeader>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
+                <TableRow>
+                  <TableHead>Image</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
+                </TableRow>
               </TableHeader>
               <TableBody>
                 {course.users?.map((user) => (
-                  <TableRow>
+                  <TableRow key={user.id}>
                     <TableCell>
                       <Avatar className="rounded">
                         <AvatarFallback>{user.email?.[0]}</AvatarFallback>
@@ -78,6 +109,71 @@ export default async function CoursePage({
                       >
                         {user.email}
                       </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={user.canceled ? "destructive" : "default"}
+                      >
+                        {user.canceled ? "Canceled" : "Active"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="flex flex-row-reverse">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button size="sm" variant="secondary" asChild>
+                            <span>
+                              <Menu size={16} />
+                            </span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem asChild>
+                            <form>
+                              <button
+                                formAction={async () => {
+                                  "use server";
+
+                                  const session =
+                                    await getRequiredAuthSession();
+
+                                  const courseId = params.courseId;
+                                  const userId = user.id;
+
+                                  const courseOnUser =
+                                    await prisma.courseOnUser.findFirst({
+                                      where: {
+                                        userId,
+                                        course: {
+                                          id: courseId,
+                                          creatorId: session?.user.id,
+                                        },
+                                      },
+                                    });
+
+                                  if (!courseOnUser) return;
+
+                                  await prisma.courseOnUser.update({
+                                    where: {
+                                      id: courseOnUser.id,
+                                    },
+                                    data: {
+                                      canceledAt: courseOnUser.canceledAt
+                                        ? null
+                                        : new Date(),
+                                    },
+                                  });
+
+                                  console.log("courseOnUser : ", courseOnUser);
+
+                                  revalidatePath(`/admin/courses/${courseId}`);
+                                }}
+                              >
+                                {user.canceled ? "Activate" : "Cancel"}
+                              </button>
+                            </form>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
