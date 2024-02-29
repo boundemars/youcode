@@ -11,9 +11,11 @@ export const Footer = () => {
           <div className="flex flex-row items-center gap-2">
             <Image
               src="/images/logo.svg"
-              width={40}
-              height={30}
+              width="0"
+              height="0"
+              style={{ width: "40px", height: "auto" }}
               alt="app logo"
+              loading="lazy"
             />
             <Typography variant="base" as={Link} href="/">
               {SiteConfig.title}
