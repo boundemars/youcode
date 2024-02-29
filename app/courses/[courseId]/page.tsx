@@ -25,14 +25,13 @@ export default async function CoursePage({
   if (!course) {
     notFound();
   }
-
   return (
     <Layout>
       <LayoutHeader>
         <LayoutTitle>Your courses</LayoutTitle>
       </LayoutHeader>
       <LayoutContent>
-        <Course course={course} />
+        <Course course={course} userId={session?.user.id} />
       </LayoutContent>
     </Layout>
   );
