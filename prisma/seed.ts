@@ -27,12 +27,12 @@ const main = async () => {
                     {
                       name: faker.lorem.words(3),
                       content: faker.lorem.paragraph(),
-                      rank: "aaaaaa",
+                      rank: "aaaaa",
                     },
                     {
                       name: faker.lorem.words(3),
                       content: faker.lorem.paragraph(),
-                      rank: "aaaaab",
+                      rank: "aaaab",
                     },
                   ],
                 },
