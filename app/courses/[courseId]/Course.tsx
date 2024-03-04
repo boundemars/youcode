@@ -17,6 +17,7 @@ export type CourseProps = {
 
 export const Course = ({ course, userId }: CourseProps) => {
   const isLogin = Boolean(userId);
+
   return (
     <>
       <div className="flex flex-col items-start gap-4">
@@ -61,60 +62,55 @@ export const Course = ({ course, userId }: CourseProps) => {
           </Card>
         </div>
         {!course.isCanceled && !course.isEnrolled && isLogin ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form>
-                <SubmitButton
-                  variant="default"
-                  size="lg"
-                  className="mt-4"
-                  disabled={course.users.length > 0 ? true : false}
-                  formAction={async () => {
-                    "use server";
-                    const session = await getRequiredAuthSession();
+          <div>
+            <form>
+              <SubmitButton
+                variant="default"
+                size="lg"
+                className="mt-4"
+                disabled={course.users.length > 0 ? true : false}
+                formAction={async () => {
+                  "use server";
+                  const session = await getRequiredAuthSession();
 
-                    const courseOnUser = await prisma.courseOnUser.create({
-                      data: {
-                        courseId: course.id,
-                        userId: session.user.id,
-                      },
-                      select: {
-                        course: {
-                          select: {
-                            id: true,
-                            lessons: {
-                              orderBy: {
-                                rank: "asc",
-                              },
-                              take: 1,
-                              select: {
-                                id: true,
-                              },
+                  const courseOnUser = await prisma.courseOnUser.create({
+                    data: {
+                      courseId: course.id,
+                      userId: session.user.id,
+                    },
+                    select: {
+                      course: {
+                        select: {
+                          id: true,
+                          lessons: {
+                            orderBy: {
+                              rank: "asc",
+                            },
+                            take: 1,
+                            select: {
+                              id: true,
                             },
                           },
                         },
                       },
-                    });
+                    },
+                  });
 
-                    const lesson = courseOnUser.course.lessons[0];
+                  const lesson = courseOnUser.course.lessons[0];
 
-                    revalidatePath(`/courses/${course.id}`);
+                  revalidatePath(`/courses/${course.id}`);
 
-                    if (!lesson) {
-                      return;
-                    }
+                  if (!lesson) {
+                    return;
+                  }
 
-                    redirect(`/courses/${course.id}/lessons/${lesson.id}`);
-                  }}
-                >
-                  Join
-                </SubmitButton>
-              </form>
-            </CardContent>
-          </Card>
+                  redirect(`/courses/${course.id}/lessons/${lesson.id}`);
+                }}
+              >
+                Join
+              </SubmitButton>
+            </form>
+          </div>
         ) : null}
       </div>
     </>
